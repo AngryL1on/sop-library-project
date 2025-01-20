@@ -11,26 +11,24 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     /**
-     * Регистрируем эндпоинт STOMP, по которому клиенты будут подключаться.
+     * We are registering the STOMP endpoint that clients will use to connect.
      */
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        // Допустим, клиент будет подключаться по /ws.
-        // С SockJS добавляется резервный транспорт для клиентов без WebSocket.
         registry.addEndpoint("/ws")
                 .setAllowedOriginPatterns("*")
                 .withSockJS();
     }
 
     /**
-     * Настраиваем брокер сообщений и префиксы:
+     * Configuring the message broker and prefixes
      */
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        // Топики, куда сервер будет отправлять сообщения, начинаются с /topic
+        // The topics where the server will send messages start with /topic
         config.enableSimpleBroker("/topic");
 
-        // Префикс для отправки сообщений с клиента на сервер
+        // The prefix for sending messages from the client to the server
         config.setApplicationDestinationPrefixes("/app");
     }
 }
