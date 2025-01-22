@@ -19,8 +19,7 @@ repositories {
 }
 
 dependencies {
-    // Spring Boot starters for MongoDB and RabbitMQ (AMQP)
-    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb' // MongoDB support
+    // Spring Boot starters for RabbitMQ (AMQP)
     implementation 'org.springframework.boot:spring-boot-starter-amqp'        // RabbitMQ (AMQP) messaging
 
     // gRPC dependencies

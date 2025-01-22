@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static dev.angryl1on.library.core.configs.RabbitMQConfig.AUDIT_LOGS_QUEUE;
+
 @Service
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
@@ -33,7 +35,7 @@ public class UserServiceImpl implements UserService {
         User user = modelMapper.map(userDTO, User.class);
         User savedUser = userRepository.save(user);
 
-        rabbitTemplate.convertAndSend("audit_logs_queue", "User registered: " + savedUser.getId());
+        rabbitTemplate.convertAndSend(AUDIT_LOGS_QUEUE, "User registered: " + savedUser.getId());
 
         return modelMapper.map(savedUser, UserDTO.class);
     }
@@ -42,7 +44,7 @@ public class UserServiceImpl implements UserService {
     public List<UserDTO> getAllUsers() {
         List<User> users = userRepository.findAll();
 
-        rabbitTemplate.convertAndSend("audit_logs_queue", "Fetched all users");
+        rabbitTemplate.convertAndSend(AUDIT_LOGS_QUEUE, "Fetched all users");
 
         return users.stream()
                 .map(user -> modelMapper.map(user, UserDTO.class))
@@ -54,7 +56,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
 
-        rabbitTemplate.convertAndSend("audit_logs_queue", "Fetched user by ID: " + id);
+        rabbitTemplate.convertAndSend(AUDIT_LOGS_QUEUE, "Fetched user by ID: " + id);
 
         return modelMapper.map(user, UserDTO.class);
     }
@@ -64,21 +66,21 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User with " + email + " not found"));
 
-        rabbitTemplate.convertAndSend("audit_logs_queue", "Fetched user by email: " + email);
+        rabbitTemplate.convertAndSend(AUDIT_LOGS_QUEUE, "Fetched user by email: " + email);
 
         return modelMapper.map(user, UserDTO.class);
     }
 
     @Override
     public List<UserDTO> getUsersByRole(UserRoles role) {
-        rabbitTemplate.convertAndSend("audit_logs_queue", "Fetched user by role: " + role);
+        rabbitTemplate.convertAndSend(AUDIT_LOGS_QUEUE, "Fetched user by role: " + role);
 
         return userRepository.findByRole(role).stream().map((s) -> modelMapper.map(s, UserDTO.class)).collect(Collectors.toList());
     }
 
     @Override
     public UserDTO updateUser(UUID id, UserDTO userDTO) {
-        rabbitTemplate.convertAndSend("audit_logs_queue", "Updated user with ID: " + id);
+        rabbitTemplate.convertAndSend(AUDIT_LOGS_QUEUE, "Updated user with ID: " + id);
 
         return modelMapper.map(userRepository.save(modelMapper.map(userDTO, User.class)), UserDTO.class);
     }
@@ -87,6 +89,6 @@ public class UserServiceImpl implements UserService {
     public void deleteUser(UUID id) {
         userRepository.deleteById(id);
 
-        rabbitTemplate.convertAndSend("audit_logs_queue", "Deleted user with ID: " + id);
+        rabbitTemplate.convertAndSend(AUDIT_LOGS_QUEUE, "Deleted user with ID: " + id);
     }
 }

@@ -22,7 +22,7 @@ import java.util.UUID;
 public interface UserApi {
     @Operation(summary = "Создать пользователя")
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    void registerUser(@RequestBody UserDTO userDTO);
+    ResponseEntity<UserDTO> registerUser(@RequestBody UserDTO userDTO);
 
     @Operation(summary = "Получить информацию о пользователе по идентификатору")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)

@@ -21,12 +21,13 @@ public class Borrowing extends Base {
      */
     protected Borrowing() { /* do nothing */ }
 
-    public Borrowing(User user, Book book, LocalDate borrowDate, LocalDate dueDate, LocalDate returnDate) {
+    public Borrowing(User user, Book book, LocalDate borrowDate, LocalDate returnDate, LocalDate dueDate, Double fee) {
         this.user = user;
         this.book = book;
         this.borrowDate = borrowDate;
-        this.dueDate = dueDate;
         this.returnDate = returnDate;
+        this.dueDate = dueDate;
+        this.fee = fee;
     }
 
     @ManyToOne

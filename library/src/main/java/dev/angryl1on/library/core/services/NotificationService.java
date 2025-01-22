@@ -18,13 +18,11 @@ public class NotificationService {
 
     @RabbitListener(queues = RabbitMQConfig.NEW_BOOKS_QUEUE)
     public void handleNewBookMessage(String message) {
-        // Например, отправляем на топик /topic/books
         messagingTemplate.convertAndSend("/topic/books", message);
     }
 
     @RabbitListener(queues = RabbitMQConfig.NEW_LIBRARIES_QUEUE)
     public void handleNewLibraryMessage(String message) {
-        // Например, отправляем на топик /topic/libraries
         messagingTemplate.convertAndSend("/topic/libraries", message);
     }
 }

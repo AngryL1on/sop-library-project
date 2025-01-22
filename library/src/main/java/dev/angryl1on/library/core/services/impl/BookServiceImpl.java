@@ -1,6 +1,5 @@
 package dev.angryl1on.library.core.services.impl;
 
-import dev.angryl1on.library.core.configs.RabbitMQConfig;
 import dev.angryl1on.library.core.exceptions.BookNotFoundException;
 import dev.angryl1on.library.core.exceptions.LibraryNotFoundException;
 import dev.angryl1on.library.core.models.entity.Book;
@@ -17,6 +16,9 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static dev.angryl1on.library.core.configs.RabbitMQConfig.AUDIT_LOGS_QUEUE;
+import static dev.angryl1on.library.core.configs.RabbitMQConfig.NEW_BOOKS_QUEUE;
 
 @Service
 public class BookServiceImpl implements BookService {
@@ -38,8 +40,8 @@ public class BookServiceImpl implements BookService {
         Book book = modelMapper.map(bookDTO, Book.class);
         Book savedBook = bookRepository.save(book);
 
-        rabbitTemplate.convertAndSend(RabbitMQConfig.AUDIT_LOGS_QUEUE, "Added new book with ID: " + savedBook.getId());
-        rabbitTemplate.convertAndSend(RabbitMQConfig.NEW_BOOKS_QUEUE,
+        rabbitTemplate.convertAndSend(AUDIT_LOGS_QUEUE, "Added new book with ID: " + savedBook.getId());
+        rabbitTemplate.convertAndSend(NEW_BOOKS_QUEUE,
                 "New book added: {\"id\": \"" + savedBook.getId() + "\", \"title\": \"" + savedBook.getTitle() + "\"}");
 
         return modelMapper.map(savedBook, BookDTO.class);
@@ -50,7 +52,7 @@ public class BookServiceImpl implements BookService {
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new BookNotFoundException(id));
 
-        rabbitTemplate.convertAndSend(RabbitMQConfig.AUDIT_LOGS_QUEUE, "Fetched book with ID: " + id);
+        rabbitTemplate.convertAndSend(AUDIT_LOGS_QUEUE, "Fetched book with ID: " + id);
 
         return modelMapper.map(book, BookDTO.class);
     }
@@ -59,7 +61,7 @@ public class BookServiceImpl implements BookService {
     public List<BookDTO> getAllBooks() {
         List<Book> books = bookRepository.findAll();
 
-        rabbitTemplate.convertAndSend(RabbitMQConfig.AUDIT_LOGS_QUEUE, "Fetched all books");
+        rabbitTemplate.convertAndSend(AUDIT_LOGS_QUEUE, "Fetched all books");
 
         return books.stream()
                 .map(book -> modelMapper.map(book, BookDTO.class))
@@ -70,7 +72,7 @@ public class BookServiceImpl implements BookService {
     public List<BookDTO> getBooksByTitle(String title) {
         List<Book> books = bookRepository.findByTitle(title);
 
-        rabbitTemplate.convertAndSend(RabbitMQConfig.AUDIT_LOGS_QUEUE, "Fetched books with title: " + title);
+        rabbitTemplate.convertAndSend(AUDIT_LOGS_QUEUE, "Fetched books with title: " + title);
 
         return books.stream()
                 .map(book -> modelMapper.map(book, BookDTO.class))
@@ -81,7 +83,7 @@ public class BookServiceImpl implements BookService {
     public List<BookDTO> getBooksByAuthor(String author) {
         List<Book> books = bookRepository.findByAuthor(author);
 
-        rabbitTemplate.convertAndSend(RabbitMQConfig.AUDIT_LOGS_QUEUE, "Fetched books by author: " + author);
+        rabbitTemplate.convertAndSend(AUDIT_LOGS_QUEUE, "Fetched books by author: " + author);
 
         return books.stream()
                 .map(book -> modelMapper.map(book, BookDTO.class))
@@ -92,7 +94,7 @@ public class BookServiceImpl implements BookService {
     public List<BookDTO> getAvailableBooks() {
         List<Book> books = bookRepository.findByAvailable(true);
 
-        rabbitTemplate.convertAndSend(RabbitMQConfig.AUDIT_LOGS_QUEUE, "Fetched available books");
+        rabbitTemplate.convertAndSend(AUDIT_LOGS_QUEUE, "Fetched available books");
 
         return books.stream()
                 .map(book -> modelMapper.map(book, BookDTO.class))
@@ -109,7 +111,7 @@ public class BookServiceImpl implements BookService {
         book.setLibrary(library);
         bookRepository.save(book);
 
-        rabbitTemplate.convertAndSend(RabbitMQConfig.AUDIT_LOGS_QUEUE,
+        rabbitTemplate.convertAndSend(AUDIT_LOGS_QUEUE,
                 "Assigned book with ID: " + bookId + " to library with ID: " + libraryId);
 
         return modelMapper.map(book, BookDTO.class);
@@ -119,6 +121,6 @@ public class BookServiceImpl implements BookService {
     public void deleteBook(UUID id) {
         bookRepository.deleteById(id);
 
-        rabbitTemplate.convertAndSend(RabbitMQConfig.AUDIT_LOGS_QUEUE, "Deleted book with ID: " + id);
+        rabbitTemplate.convertAndSend(AUDIT_LOGS_QUEUE, "Deleted book with ID: " + id);
     }
 }

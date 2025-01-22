@@ -1,6 +1,6 @@
 package dev.angryl1on.grpcserver.configs;
 
-import dev.angryl1on.grpcserver.services.BillingServiceImpl;
+import dev.angryl1on.grpcserver.services.PenaltyServiceImpl;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,23 +9,23 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class GrpcConfiguration implements CommandLineRunner {
-    private final BillingServiceImpl billingService;
+    private final PenaltyServiceImpl penaltyService;
 
     /**
-     * Constructor for injecting the {@link BillingServiceImpl}.
+     * Constructor for injecting the {@link PenaltyServiceImpl}.
      *
-     * @param billingService The service implementation to be used by the gRPC server.
+     * @param penaltyService The service implementation to be used by the gRPC server.
      */
     @Autowired
-    public GrpcConfiguration(BillingServiceImpl billingService) {
-        this.billingService = billingService;
+    public GrpcConfiguration(PenaltyServiceImpl penaltyService) {
+        this.penaltyService = penaltyService;
     }
 
     /**
      * Starts the gRPC server when the application begins running.
      *
      * <p>The server is configured to listen on port 8080 and register the provided
-     * {@link BillingServiceImpl}. Once started, the server blocks the main
+     * {@link PenaltyServiceImpl}. Once started, the server blocks the main
      * thread and continues to handle incoming gRPC requests until termination.</p>
      *
      * @param args Command-line arguments passed to the application (not used).
@@ -34,7 +34,7 @@ public class GrpcConfiguration implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         Server server = ServerBuilder.forPort(9090)
-                .addService(billingService)
+                .addService(penaltyService)
                 .build();
 
         server.start();

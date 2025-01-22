@@ -14,6 +14,9 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static dev.angryl1on.library.core.configs.RabbitMQConfig.AUDIT_LOGS_QUEUE;
+import static dev.angryl1on.library.core.configs.RabbitMQConfig.NEW_LIBRARIES_QUEUE;
+
 @Service
 public class LibraryServiceImpl implements LibraryService {
     private final LibraryRepository libraryRepository;
@@ -32,8 +35,8 @@ public class LibraryServiceImpl implements LibraryService {
         Library library = modelMapper.map(libraryDTO, Library.class);
         Library savedLibrary = libraryRepository.save(library);
 
-        rabbitTemplate.convertAndSend("audit_logs_queue", "Library added: " + savedLibrary.getId());
-        rabbitTemplate.convertAndSend("new_libraries_queue",
+        rabbitTemplate.convertAndSend(AUDIT_LOGS_QUEUE, "Library added: " + savedLibrary.getId());
+        rabbitTemplate.convertAndSend(NEW_LIBRARIES_QUEUE,
                 "New library added: {\"id\": \"" + savedLibrary.getId() + "\", \"name\": \"" + savedLibrary.getName() + "\"}");
 
         return modelMapper.map(savedLibrary, LibraryDTO.class);
@@ -44,7 +47,7 @@ public class LibraryServiceImpl implements LibraryService {
         Library library = libraryRepository.findById(id)
                 .orElseThrow(() -> new LibraryNotFoundException(id));
 
-        rabbitTemplate.convertAndSend("audit_logs_queue", "Fetched library by ID: " + id);
+        rabbitTemplate.convertAndSend(AUDIT_LOGS_QUEUE, "Fetched library by ID: " + id);
 
         return modelMapper.map(library, LibraryDTO.class);
     }
@@ -53,7 +56,7 @@ public class LibraryServiceImpl implements LibraryService {
     public List<LibraryDTO> getAllLibraries() {
         List<Library> libraries = libraryRepository.findAll();
 
-        rabbitTemplate.convertAndSend("audit_logs_queue", "Fetched all libraries");
+        rabbitTemplate.convertAndSend(AUDIT_LOGS_QUEUE, "Fetched all libraries");
 
         return libraries.stream()
                 .map(library -> modelMapper.map(library, LibraryDTO.class))
@@ -64,7 +67,7 @@ public class LibraryServiceImpl implements LibraryService {
     public List<LibraryDTO> getLibrariesByName(String name) {
         List<Library> libraries = libraryRepository.findByName(name);
 
-        rabbitTemplate.convertAndSend("audit_logs_queue", "Fetched libraries by name: " + name);
+        rabbitTemplate.convertAndSend(AUDIT_LOGS_QUEUE, "Fetched libraries by name: " + name);
 
         return libraries.stream()
                 .map(library -> modelMapper.map(library, LibraryDTO.class))
@@ -75,7 +78,7 @@ public class LibraryServiceImpl implements LibraryService {
     public List<LibraryDTO> getLibrariesByAddress(String address) {
         List<Library> libraries = libraryRepository.findByAddress(address);
 
-        rabbitTemplate.convertAndSend("audit_logs_queue", "Fetched libraries by address: " + address);
+        rabbitTemplate.convertAndSend(AUDIT_LOGS_QUEUE, "Fetched libraries by address: " + address);
 
         return libraries.stream()
                 .map(library -> modelMapper.map(library, LibraryDTO.class))
@@ -86,6 +89,6 @@ public class LibraryServiceImpl implements LibraryService {
     public void deleteLibrary(UUID id) {
         libraryRepository.deleteById(id);
 
-        rabbitTemplate.convertAndSend("audit_logs_queue", "Deleted library with ID: " + id);
+        rabbitTemplate.convertAndSend(AUDIT_LOGS_QUEUE, "Deleted library with ID: " + id);
     }
 }

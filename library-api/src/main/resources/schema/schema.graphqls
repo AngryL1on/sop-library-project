@@ -94,6 +94,8 @@ type Borrowing {
     book: Book!
     borrowDate: String!
     returnDate: String
+    dueDate: String!
+    fee: String
 }
 
 enum UserRole {
