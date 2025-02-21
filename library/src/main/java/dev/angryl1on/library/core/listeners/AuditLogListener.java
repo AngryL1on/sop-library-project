@@ -1,4 +1,4 @@
-package dev.angryl1on.library.core;
+package dev.angryl1on.library.core.listeners;
 
 import dev.angryl1on.library.core.configs.RabbitMQConfig;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;

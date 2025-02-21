@@ -13,16 +13,19 @@ public class Borrowing extends Base {
     private Book book;
     private LocalDate borrowDate;
     private LocalDate returnDate;
+    private LocalDate dueDate;
+    private Double fee;
 
     /**
      * Protected constructor for JPA.
      */
     protected Borrowing() { /* do nothing */ }
 
-    public Borrowing(User user, Book book, LocalDate borrowDate, LocalDate returnDate) {
+    public Borrowing(User user, Book book, LocalDate borrowDate, LocalDate dueDate, LocalDate returnDate) {
         this.user = user;
         this.book = book;
         this.borrowDate = borrowDate;
+        this.dueDate = dueDate;
         this.returnDate = returnDate;
     }
 
@@ -58,5 +61,21 @@ public class Borrowing extends Base {
 
     public void setReturnDate(LocalDate returnDate) {
         this.returnDate = returnDate;
+    }
+
+    public LocalDate getDueDate() {
+        return dueDate;
+    }
+
+    public void setDueDate(LocalDate dueDate) {
+        this.dueDate = dueDate;
+    }
+
+    public Double getFee() {
+        return fee;
+    }
+
+    public void setFee(Double fee) {
+        this.fee = fee;
     }
 }

@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+option java_package = "dev.angryl1on.grpc.billing";
+option java_outer_classname = "BillingServiceProto";
+
+message CalculateFeeRequest {
+  string borrowingId = 1;    // ID операции заимствования
+  string borrowDate = 2;     // Дата, когда книга была взята
+  string dueDate = 3;        // Дата, к которой книга должна быть возвращена (если есть)
+  string returnDate = 4;     // Фактическая дата возврата (может быть пустой)
+}
+
+message CalculateFeeResponse {
+  double fee = 1;
+}
+
+service BillingService {
+  rpc CalculateFee (CalculateFeeRequest) returns (CalculateFeeResponse);
+}
