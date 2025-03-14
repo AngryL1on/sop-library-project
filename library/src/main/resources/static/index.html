@@ -21,16 +21,13 @@
         client = new StompJs.Client({
             webSocketFactory: () => new SockJS('/ws'),
 
-            // Коллбэк, вызывается при успешном подключении
             onConnect: function (frame) {
                 console.log('Connected: ' + frame);
 
-                // Подписываемся на топик, куда шлём уведомления о новых книгах
                 client.subscribe('/topic/books', function (message) {
                     showBookMessage(message.body);
                 });
 
-                // Подписываемся на топик, куда шлём уведомления о новых библиотеках
                 client.subscribe('/topic/libraries', function (message) {
                     showLibraryMessage(message.body);
                 });

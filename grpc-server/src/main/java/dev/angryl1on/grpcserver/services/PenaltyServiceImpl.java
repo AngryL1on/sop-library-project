@@ -12,7 +12,8 @@ import java.time.temporal.ChronoUnit;
 public class PenaltyServiceImpl extends PenaltyGrpc.PenaltyImplBase {
 
     @Override
-    public void calculatePenalty(PenaltyServiceProto.CalculatePenaltyRequest request, StreamObserver<PenaltyServiceProto.CalculatePenaltyResponse> responseObserver) {
+    public void calculatePenalty(PenaltyServiceProto.CalculatePenaltyRequest request,
+                                 StreamObserver<PenaltyServiceProto.CalculatePenaltyResponse> responseObserver) {
         LocalDate dueDate = LocalDate.parse(request.getDueDate());
         LocalDate returnDate = LocalDate.parse(request.getReturnDate());
 
