@@ -1,6 +1,9 @@
 package dev.angryl1on.library.core.configs;
 
+import dev.angryl1on.library.core.models.entity.Borrowing;
+import dev.angryl1on.libraryapi.models.dtos.BorrowingDTO;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.PropertyMap;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -9,23 +12,17 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class BeanConfig {
-    /**
-     * Creates a bean for the ModelMapper class.
-     *
-     * <p>The ModelMapper is a utility class that provides a convenient way to
-     * map an instance of one object to an instance of another object type.
-     * It automatically determines how one object model maps to another,
-     * allowing for the construction of plain data objects from request
-     * payloads or database responses.
-     *
-     * @return an instance of the ModelMapper class
-     */
     @Bean
     public ModelMapper modelMapper() {
         ModelMapper modelMapper = new ModelMapper();
-        modelMapper.getConfiguration()
-                .setFieldMatchingEnabled(true)
-                .setFieldAccessLevel(org.modelmapper.config.Configuration.AccessLevel.PRIVATE);
+        modelMapper.addMappings(new PropertyMap<Borrowing, BorrowingDTO>() {
+            @Override
+            protected void configure() {
+                map(source.getDueDate(), destination.getDueDate());
+                map(source.getFee(), destination.getFee());
+            }
+        });
         return modelMapper;
     }
+
 }

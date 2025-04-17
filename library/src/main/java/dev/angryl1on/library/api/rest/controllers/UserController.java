@@ -9,6 +9,7 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,8 +27,9 @@ public class UserController implements UserApi {
 
     @Override
     @PostMapping("/register")
-    public void registerUser(@RequestBody UserDTO userDTO) {
-        userService.registerUser(userDTO);
+    public ResponseEntity<UserDTO> registerUser(@RequestBody UserDTO userDTO) {
+        UserDTO newUser = userService.registerUser(userDTO);
+        return ResponseEntity.created(URI.create("/api/users" + newUser.getId())).body(userAssembler.toModel(newUser));
     }
 
     @Override

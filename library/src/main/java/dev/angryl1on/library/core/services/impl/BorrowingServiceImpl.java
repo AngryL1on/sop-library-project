@@ -4,6 +4,7 @@ import dev.angryl1on.library.core.exceptions.BookNotFoundException;
 import dev.angryl1on.library.core.exceptions.BorrowingNotFoundByIdException;
 import dev.angryl1on.library.core.exceptions.BorrowingNotFoundException;
 import dev.angryl1on.library.core.exceptions.UserNotFoundException;
+import dev.angryl1on.library.core.models.dtos.mb.ReturnBookPenaltyDTO;
 import dev.angryl1on.library.core.models.entity.Book;
 import dev.angryl1on.library.core.models.entity.Borrowing;
 import dev.angryl1on.library.core.models.entity.User;
@@ -22,8 +23,12 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static dev.angryl1on.library.core.configs.RabbitMQConfig.AUDIT_LOGS_QUEUE;
+import static dev.angryl1on.library.core.configs.RabbitMQConfig.RETURN_BOOK_PENALTY_QUEUE;
+
 @Service
 public class BorrowingServiceImpl implements BorrowingService {
+
     private final BorrowingRepository borrowingRepository;
     private final UserRepository userRepository;
     private final BookRepository bookRepository;
@@ -47,13 +52,17 @@ public class BorrowingServiceImpl implements BorrowingService {
     public BorrowingDTO borrowBook(UUID userId, UUID bookId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
+
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new BookNotFoundException(bookId));
 
-        Borrowing borrowing = new Borrowing(user, book, LocalDate.now(), null);
+        LocalDate dueDate = LocalDate.now().plusDays(14);
+        Double fee = 0.0;
+
+        Borrowing borrowing = new Borrowing(user, book, LocalDate.now(), null, dueDate, fee);
         Borrowing savedBorrowing = borrowingRepository.save(borrowing);
 
-        rabbitTemplate.convertAndSend("audit_logs_queue",
+        rabbitTemplate.convertAndSend(AUDIT_LOGS_QUEUE,
                 "User with ID " + userId + " borrowed book with ID " + bookId);
 
         return modelMapper.map(savedBorrowing, BorrowingDTO.class);
@@ -64,10 +73,15 @@ public class BorrowingServiceImpl implements BorrowingService {
         Borrowing borrowing = borrowingRepository.findByUserIdAndBookId(userId, bookId)
                 .orElseThrow(() -> new BorrowingNotFoundByIdException(userId, bookId));
 
-        borrowing.setReturnDate(LocalDate.now());
+        LocalDate returnDate = LocalDate.now();
+        borrowing.setReturnDate(returnDate);
+
+        ReturnBookPenaltyDTO penaltyDTO = new ReturnBookPenaltyDTO(borrowing.getDueDate(), returnDate, borrowing.getId());
+        rabbitTemplate.convertAndSend(RETURN_BOOK_PENALTY_QUEUE, penaltyDTO);
+
         borrowingRepository.save(borrowing);
 
-        rabbitTemplate.convertAndSend("audit_logs_queue",
+        rabbitTemplate.convertAndSend(AUDIT_LOGS_QUEUE,
                 "User with ID " + userId + " returned book with ID " + bookId);
     }
 
@@ -76,7 +90,7 @@ public class BorrowingServiceImpl implements BorrowingService {
         Borrowing borrowing = borrowingRepository.findById(id)
                 .orElseThrow(() -> new BorrowingNotFoundException(id));
 
-        rabbitTemplate.convertAndSend("audit_logs_queue",
+        rabbitTemplate.convertAndSend(AUDIT_LOGS_QUEUE,
                 "Fetched borrowing with ID " + id);
 
         return modelMapper.map(borrowing, BorrowingDTO.class);
@@ -86,7 +100,7 @@ public class BorrowingServiceImpl implements BorrowingService {
     public List<BorrowingDTO> getAllBorrowings() {
         List<Borrowing> borrowings = borrowingRepository.findAll();
 
-        rabbitTemplate.convertAndSend("audit_logs_queue",
+        rabbitTemplate.convertAndSend(AUDIT_LOGS_QUEUE,
                 "Fetched all borrowings");
 
         return borrowings.stream()
@@ -101,7 +115,7 @@ public class BorrowingServiceImpl implements BorrowingService {
 
         List<Borrowing> borrowings = borrowingRepository.findByUser(user);
 
-        rabbitTemplate.convertAndSend("audit_logs_queue",
+        rabbitTemplate.convertAndSend(AUDIT_LOGS_QUEUE,
                 "Fetched borrowings for user with ID " + userId);
 
         return borrowings.stream()
@@ -116,7 +130,7 @@ public class BorrowingServiceImpl implements BorrowingService {
 
         List<Borrowing> activeBorrowings = borrowingRepository.findActiveBorrowingsByUser(user);
 
-        rabbitTemplate.convertAndSend("audit_logs_queue",
+        rabbitTemplate.convertAndSend(AUDIT_LOGS_QUEUE,
                 "Fetched active borrowings for user with ID " + userId);
 
         return activeBorrowings.stream()
@@ -131,7 +145,7 @@ public class BorrowingServiceImpl implements BorrowingService {
 
         List<Borrowing> activeBorrowings = borrowingRepository.findActiveBorrowingsByBook(book);
 
-        rabbitTemplate.convertAndSend("audit_logs_queue",
+        rabbitTemplate.convertAndSend(AUDIT_LOGS_QUEUE,
                 "Fetched active borrowings for book with ID " + bookId);
 
         return activeBorrowings.stream()

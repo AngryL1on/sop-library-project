@@ -27,7 +27,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 
     // PostgreSQL Database
-    implementation 'org.postgresql:postgresql:42.6.0'
+    implementation 'org.postgresql:postgresql:42.7.2'
 
     // GraphQL DGS
     implementation 'com.netflix.graphql.dgs:graphql-dgs-spring-boot-starter:9.0.4'
@@ -39,7 +39,7 @@ dependencies {
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
 
     // Local Library API
-    implementation files('libs/library-api-1.0.jar')
+    implementation files('libs/library-api-0.0.1-SNAPSHOT-plain.jar')
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'

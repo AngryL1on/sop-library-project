@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+option java_package = "dev.angryl1on.grpc.penalty";
+option java_outer_classname = "PenaltyServiceProto";
+
+
+service Penalty {
+  rpc calculatePenalty(CalculatePenaltyRequest) returns (CalculatePenaltyResponse);
+}
+
+message CalculatePenaltyRequest {
+  string dueDate = 1;
+  string returnDate = 2;
+}
+
+message CalculatePenaltyResponse {
+  double penaltyAmount = 1;
+}

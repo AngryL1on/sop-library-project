@@ -10,9 +10,6 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-    /**
-     * We are registering the STOMP endpoint that clients will use to connect.
-     */
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
@@ -20,16 +17,10 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 .withSockJS();
     }
 
-    /**
-     * Configuring the message broker and prefixes
-     */
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        // The topics where the server will send messages start with /topic
         config.enableSimpleBroker("/topic");
 
-        // The prefix for sending messages from the client to the server
         config.setApplicationDestinationPrefixes("/app");
     }
 }
-

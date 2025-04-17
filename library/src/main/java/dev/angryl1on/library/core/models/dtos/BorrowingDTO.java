@@ -12,14 +12,17 @@ public class BorrowingDTO extends RepresentationModel<BorrowingDTO> {
     private BookDTO book;
     private LocalDate borrowDate;
     private LocalDate returnDate;
+    private LocalDate dueDate;
+    private Double fee;
 
     public BorrowingDTO() { /* Do nothing */ }
 
-    public BorrowingDTO(UUID id, UserDTO user, BookDTO book, LocalDate borrowDate, LocalDate returnDate) {
+    public BorrowingDTO(UUID id, UserDTO user, BookDTO book, LocalDate borrowDate, LocalDate dueDate, LocalDate returnDate) {
         this.id = id;
         this.user = user;
         this.book = book;
         this.borrowDate = borrowDate;
+        this.dueDate = dueDate;
         this.returnDate = returnDate;
     }
 
@@ -65,6 +68,22 @@ public class BorrowingDTO extends RepresentationModel<BorrowingDTO> {
         this.returnDate = returnDate;
     }
 
+    public LocalDate getDueDate() {
+        return dueDate;
+    }
+
+    public void setDueDate(LocalDate dueDate) {
+        this.dueDate = dueDate;
+    }
+
+    public Double getFee() {
+        return fee;
+    }
+
+    public void setFee(Double fee) {
+        this.fee = fee;
+    }
+
     @Override
     public String toString() {
         return "BorrowingDTO{" +
@@ -73,6 +92,8 @@ public class BorrowingDTO extends RepresentationModel<BorrowingDTO> {
                 ", book=" + book +
                 ", borrowDate=" + borrowDate +
                 ", returnDate=" + returnDate +
+                ", dueDate=" + dueDate +
+                ", fee=" + fee +
                 '}';
     }
 }

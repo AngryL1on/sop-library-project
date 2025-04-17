@@ -21,33 +21,27 @@
         client = new StompJs.Client({
             webSocketFactory: () => new SockJS('/ws'),
 
-            // Коллбэк, вызывается при успешном подключении
             onConnect: function (frame) {
                 console.log('Connected: ' + frame);
 
-                // Подписываемся на топик, куда шлём уведомления о новых книгах
                 client.subscribe('/topic/books', function (message) {
                     showBookMessage(message.body);
                 });
 
-                // Подписываемся на топик, куда шлём уведомления о новых библиотеках
                 client.subscribe('/topic/libraries', function (message) {
                     showLibraryMessage(message.body);
                 });
             },
 
-            // Опционально: при ошибке соединения или потере связи
             onStompError: function (frame) {
                 console.error('Broker reported error: ' + frame.headers['message']);
                 console.error('Additional details: ' + frame.body);
             }
         });
 
-        // Активируем соединение
         client.activate();
     }
 
-    // Функции отображения сообщения в DOM
     function showBookMessage(message) {
         const booksDiv = document.getElementById('books');
         const p = document.createElement('p');
@@ -62,7 +56,6 @@
         librariesDiv.appendChild(p);
     }
 
-    // Инициируем подключение после загрузки страницы
     window.onload = connect;
 </script>
 </body>
